@@ -12,9 +12,8 @@ import getopt
 from datetime import datetime
 
 PFAD_HostConf = "/common/usr/dhcp/hosts.conf"
-PFAD_NagiosOb = "/etc/nagios/objects"
+PFAD_NagiosOb = "/etc/nagios/objects/"
 PFAD_CpHost   = "myhosts.conf"
-server_adress ="tsl001.acc.gsi.de"
 
 detec_sw ="nwt"
 detec_pex="pexaria"
@@ -36,7 +35,7 @@ host_struct=["define host {", "use", "host_name", "address", "}"]
 def help_txt():
     print "usage: nogen [argument] [filename]"
     print "Nodes generator (nogen) generate from the host.conf file a cfg file for nagios"
-    print "The standart file name is nodes_xxx.cfg."
+    print "The standart file name is"+PFAD_NagiosOb+"nodes_xxx.cfg." 
     print "The file must be exist."
     print "arguments are :"
     print "-n  --nwt   create wr-switches nagos file"
@@ -124,7 +123,7 @@ def write_file(hostlist, filename):
 
 FileOutName = "None"
 myhostlist=[]
-
+todo ="-h"
 
 # arguments einlesen
 try:
@@ -150,23 +149,28 @@ for o, arg in myopts:
         FileOutName=args
     elif o in ("-e","--expl"):
         todo=detec_expl
+        FileOutName=args
     elif o in ("-v","--vme"):
         todo=detec_vme
         FileOutName=args
     else: 
         help_txt()
 
+
+
+if todo == "-h":
+        help_txt()
+        sys.exit(2)
+
 #file name generieren
 try:
     filename=FileOutName[0]
 except:
     filename = fileCfg_begin+todo+fileCfg_end
-    
-print filename
-
+    filename=PFAD_NagiosOb+filename
 
 # host file durchsuchen & informationen extrahieren
-unitlist=extract(todo, PFAD_CpHost)
+unitlist=extract(todo, PFAD_HostConf)
 
 # host liste generieren
 host_list=makehost(unitlist, todo)
